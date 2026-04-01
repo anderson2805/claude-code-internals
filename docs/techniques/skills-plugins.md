@@ -1,5 +1,6 @@
 ---
 title: Skills & Plugin System
+layout: default
 parent: Prompt Engineering
 nav_order: 2
 ---

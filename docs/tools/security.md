@@ -1,5 +1,6 @@
 ---
 title: Security Model
+layout: default
 parent: Tool System
 nav_order: 1
 ---

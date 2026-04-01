@@ -1,5 +1,6 @@
 ---
 title: Memory System
+layout: default
 parent: Architecture Overview
 nav_order: 2
 ---

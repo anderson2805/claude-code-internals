@@ -1,5 +1,6 @@
 ---
 title: IDE Bridge System
+layout: default
 parent: Architecture Overview
 nav_order: 3
 ---

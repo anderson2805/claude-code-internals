@@ -1,5 +1,6 @@
 ---
 title: Advanced Workflows
+layout: default
 parent: Practical Tips
 nav_order: 1
 ---

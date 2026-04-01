@@ -1,5 +1,6 @@
 ---
 title: The Agent Loop
+layout: default
 parent: Architecture Overview
 nav_order: 1
 ---

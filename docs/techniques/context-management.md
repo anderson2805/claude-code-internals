@@ -1,5 +1,6 @@
 ---
 title: Context Window Management
+layout: default
 parent: Prompt Engineering
 nav_order: 1
 ---

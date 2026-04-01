@@ -1,5 +1,6 @@
 ---
 title: Services Layer
+layout: default
 parent: Architecture Overview
 nav_order: 4
 ---

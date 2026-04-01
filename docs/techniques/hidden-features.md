@@ -1,5 +1,6 @@
 ---
 title: Hidden & Surprising Features
+layout: default
 parent: Prompt Engineering
 nav_order: 3
 ---

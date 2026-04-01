@@ -1,5 +1,6 @@
 ---
 title: File Editing Strategy
+layout: default
 parent: Tool System
 nav_order: 2
 ---

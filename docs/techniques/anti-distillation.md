@@ -1,5 +1,6 @@
 ---
 title: Anti-Distillation & Undercover
+layout: default
 parent: Prompt Engineering
 nav_order: 4
 ---
