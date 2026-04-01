@@ -11,17 +11,10 @@ The bridge subsystem is one of the largest in Claude Code (31 modules), handling
 
 ## Bridge Architecture
 
-```
-┌──────────────┐         ┌──────────────┐
-│  IDE Extension│◄───────►│  Bridge      │
-│  (VS Code /   │  WebSocket│  Layer       │
-│   JetBrains)  │         │  (31 modules)│
-└──────────────┘         └──────┬───────┘
-                                │
-                         ┌──────▼───────┐
-                         │  Claude Code  │
-                         │  Core         │
-                         └──────────────┘
+```mermaid
+flowchart LR
+    A["IDE Extension<br/>(VS Code / JetBrains)"] <-->|WebSocket| B["Bridge Layer<br/>(31 modules)"]
+    B --> C["Claude Code<br/>Core"]
 ```
 
 ## Key Bridge Modules

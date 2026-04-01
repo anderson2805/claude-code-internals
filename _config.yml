@@ -27,6 +27,9 @@ defaults:
     values:
       layout: "default"
 
+mermaid:
+  version: "11"
+
 callouts:
   insight:
     title: Key Insight

@@ -31,45 +31,17 @@ Manages the actual API calls, including:
 
 ## How a Turn Works
 
-```
-User Input
-    │
-    ▼
-┌──────────────────┐
-│ Assemble Context  │ ◄── System prompt + history + tools
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│  API Call         │ ◄── Streaming response
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│  Parse Response   │
-└────────┬─────────┘
-         │
-    ┌────┴────┐
-    │         │
-    ▼         ▼
- Text      Tool Calls
- Output    ┌──────────────┐
-           │ Permission   │
-           │ Check        │
-           └──────┬───────┘
-                  │
-           ┌──────┴───────┐
-           │ Execute Tool  │
-           └──────┬───────┘
-                  │
-           ┌──────┴───────┐
-           │ Append Result │
-           │ to History    │
-           └──────┬───────┘
-                  │
-                  ▼
-           Next API Call
-           (loop continues)
+```mermaid
+flowchart TD
+    A[User Input] --> B["Assemble Context<br/>(system prompt + history + tools)"]
+    B --> C["API Call<br/>(streaming response)"]
+    C --> D[Parse Response]
+    D --> E[Text Output]
+    D --> F[Tool Calls]
+    F --> G[Permission Check]
+    G --> H[Execute Tool]
+    H --> I[Append Result to History]
+    I --> C
 ```
 
 ## Context Assembly

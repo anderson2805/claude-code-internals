@@ -11,20 +11,15 @@ Claude Code implements a multi-layered security system that's significantly more
 
 ## Security Layers
 
-```
-┌─────────────────────────────────┐
-│  Layer 1: System Prompt Rules   │  "Never force push to main"
-├─────────────────────────────────┤
-│  Layer 2: Permission Handlers   │  Interactive / Coordinator / Swarm
-├─────────────────────────────────┤
-│  Layer 3: Command Analysis      │  Destructive command detection
-├─────────────────────────────────┤
-│  Layer 4: Path Validation       │  Directory boundary enforcement
-├─────────────────────────────────┤
-│  Layer 5: Mode Validation       │  Read-only mode enforcement
-├─────────────────────────────────┤
-│  Layer 6: Sandbox               │  OS-level process isolation
-└─────────────────────────────────┘
+```mermaid
+block-beta
+    columns 1
+    L1["Layer 1: System Prompt Rules — 'Never force push to main'"]
+    L2["Layer 2: Permission Handlers — Interactive / Coordinator / Swarm"]
+    L3["Layer 3: Command Analysis — Destructive command detection"]
+    L4["Layer 4: Path Validation — Directory boundary enforcement"]
+    L5["Layer 5: Mode Validation — Read-only mode enforcement"]
+    L6["Layer 6: Sandbox — OS-level process isolation"]
 ```
 
 ## Layer 1: Prompt-Level Safety

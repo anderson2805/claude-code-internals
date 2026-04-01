@@ -11,33 +11,16 @@ Claude Code is a surprisingly large and complex TypeScript application. With 1,9
 
 ## The Big Picture
 
-```
-                    ┌─────────────────────────┐
-                    │     Entry Points         │
-                    │  CLI / SDK / MCP / IDE   │
-                    └────────────┬────────────┘
-                                 │
-                    ┌────────────▼────────────┐
-                    │    Bootstrap & Setup     │
-                    │  Auth, Config, State     │
-                    └────────────┬────────────┘
-                                 │
-                    ┌────────────▼────────────┐
-                    │   Coordinator / REPL     │
-                    │    (Agent Loop Core)     │
-                    └────────────┬────────────┘
-                                 │
-              ┌──────────────────┼──────────────────┐
-              │                  │                  │
-    ┌─────────▼─────────┐ ┌─────▼──────┐ ┌────────▼────────┐
-    │   Tool System      │ │  Services  │ │  Bridge (IDE)   │
-    │ 20+ built-in tools │ │ 130 modules│ │  31 modules     │
-    └─────────┬─────────┘ └─────┬──────┘ └────────┬────────┘
-              │                  │                  │
-    ┌─────────▼─────────┐ ┌─────▼──────┐ ┌────────▼────────┐
-    │   Hooks & Perms    │ │  Memory    │ │  Remote Sessions│
-    │   104 modules      │ │  System    │ │  WebSocket      │
-    └────────────────────┘ └────────────┘ └─────────────────┘
+```mermaid
+graph TD
+    A["Entry Points<br/>CLI / SDK / MCP / IDE"] --> B["Bootstrap & Setup<br/>Auth, Config, State"]
+    B --> C["Coordinator / REPL<br/>(Agent Loop Core)"]
+    C --> D["Tool System<br/>20+ built-in tools"]
+    C --> E["Services<br/>130 modules"]
+    C --> F["Bridge (IDE)<br/>31 modules"]
+    D --> G["Hooks & Perms<br/>104 modules"]
+    E --> H["Memory<br/>System"]
+    F --> I["Remote Sessions<br/>WebSocket"]
 ```
 
 ## Subsystem Inventory

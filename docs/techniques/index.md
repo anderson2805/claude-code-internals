@@ -13,22 +13,16 @@ Claude Code's system prompt is a masterclass in production prompt engineering. I
 
 The system prompt is assembled from `constants/systemPromptSections.ts` and includes:
 
-```
-┌─────────────────────────────────┐
-│  1. Core Identity & Rules       │  Who Claude Code is, how to behave
-├─────────────────────────────────┤
-│  2. Tool Definitions            │  Each tool's prompt.ts content
-├─────────────────────────────────┤
-│  3. Environment Context         │  OS, shell, working directory, git
-├─────────────────────────────────┤
-│  4. CLAUDE.md Instructions      │  Project-specific rules
-├─────────────────────────────────┤
-│  5. Memory Content              │  Relevant persisted memories
-├─────────────────────────────────┤
-│  6. Active Session Context      │  Current task state, files
-├─────────────────────────────────┤
-│  7. System Reminders            │  Injected during conversation
-└─────────────────────────────────┘
+```mermaid
+block-beta
+    columns 1
+    S1["1. Core Identity & Rules — Who Claude Code is, how to behave"]
+    S2["2. Tool Definitions — Each tool's prompt.ts content"]
+    S3["3. Environment Context — OS, shell, working directory, git"]
+    S4["4. CLAUDE.md Instructions — Project-specific rules"]
+    S5["5. Memory Content — Relevant persisted memories"]
+    S6["6. Active Session Context — Current task state, files"]
+    S7["7. System Reminders — Injected during conversation"]
 ```
 
 ## Key Prompt Techniques Used

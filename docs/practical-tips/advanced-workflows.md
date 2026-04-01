@@ -13,12 +13,10 @@ Understanding Claude Code's internals enables workflows that go beyond basic "as
 
 Claude Code supports git worktrees natively through `EnterWorktreeTool` and `ExitWorktreeTool`. This enables:
 
-```
-Main workspace (stable)
-    │
-    ├── Worktree A (feature branch - agent working)
-    │
-    └── Worktree B (experiment - different agent)
+```mermaid
+graph TD
+    A["Main workspace (stable)"] --> B["Worktree A<br/>(feature branch - agent working)"]
+    A --> C["Worktree B<br/>(experiment - different agent)"]
 ```
 
 **How to use it:**
@@ -51,9 +49,9 @@ The `EnterPlanModeTool` switches Claude Code into a planning mode where:
 
 The `ScheduleCronTool` (with CronCreate, CronDelete, CronList) enables scheduled autonomous operations:
 
-```
-Schedule: "Every day at 9am"
-Task: "Check for dependency updates and create a PR if any are found"
+```mermaid
+flowchart LR
+    A["⏰ Schedule:<br/>Every day at 9am"] --> B["🤖 Task:<br/>Check for dependency updates<br/>and create a PR if any found"]
 ```
 
 **Use cases:**
@@ -70,8 +68,9 @@ Task: "Check for dependency updates and create a PR if any are found"
 
 The `RemoteTriggerTool` enables triggering Claude Code agents remotely:
 
-```
-External System → Trigger → Claude Code Agent → Result
+```mermaid
+flowchart LR
+    A[External System] --> B[Trigger] --> C[Claude Code Agent] --> D[Result]
 ```
 
 **Use cases:**
@@ -105,9 +104,9 @@ The `LSPTool` integrates Language Server Protocol, giving Claude Code:
 
 Claude Code can connect to MCP servers for extended capabilities:
 
-```
-Claude Code ←→ MCP Server ←→ External Service
-                              (Database, API, etc.)
+```mermaid
+flowchart LR
+    A[Claude Code] <--> B[MCP Server] <--> C["External Service<br/>(Database, API, etc.)"]
 ```
 
 **Key modules:**
@@ -124,12 +123,12 @@ Claude Code ←→ MCP Server ←→ External Service
 
 Use the memory system strategically:
 
-```
-Memory Types:
-├── user     → Your role, expertise, preferences
-├── feedback → Corrections and confirmations
-├── project  → Current work context
-└── reference→ External resource pointers
+```mermaid
+graph TD
+    M[Memory Types] --> U["user — Your role, expertise, preferences"]
+    M --> F["feedback — Corrections and confirmations"]
+    M --> P["project — Current work context"]
+    M --> R["reference — External resource pointers"]
 ```
 
 **Advanced memory techniques:**
@@ -146,12 +145,9 @@ Memory Types:
 
 The `BriefTool` creates structured handoff documents:
 
-```
-Session 1: Research phase
-    │
-    ▼ (Brief with findings + attachments)
-    │
-Session 2: Implementation phase
+```mermaid
+flowchart TD
+    A["Session 1: Research phase"] -->|"Brief with findings + attachments"| B["Session 2: Implementation phase"]
 ```
 
 **What briefs include:**
@@ -168,14 +164,14 @@ Session 2: Implementation phase
 
 Launch multiple sub-agents simultaneously for independent tasks:
 
-```
-Main Agent
-    ├── Agent 1: "Research authentication patterns" (explore)
-    ├── Agent 2: "Find all API endpoints" (explore)
-    └── Agent 3: "Check test coverage" (general-purpose)
-         │
-         ▼ (all return results)
-    Main Agent: Synthesize and implement
+```mermaid
+graph TD
+    MA[Main Agent] --> A1["Agent 1: Research auth patterns<br/>(explore)"]
+    MA --> A2["Agent 2: Find all API endpoints<br/>(explore)"]
+    MA --> A3["Agent 3: Check test coverage<br/>(general-purpose)"]
+    A1 -->|results| MA2["Main Agent: Synthesize and implement"]
+    A2 -->|results| MA2
+    A3 -->|results| MA2
 ```
 
 **Source:** `tools/AgentTool/forkSubagent.ts`, `runAgent.ts`
