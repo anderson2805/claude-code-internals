@@ -14,6 +14,7 @@ Claude Code's tool system is the mechanism through which it interacts with your 
 Claude Code has 20+ built-in tools, each following the tool-per-directory pattern:
 
 ### File Operations
+
 | Tool | Directory | Key Files |
 |:-----|:----------|:----------|
 | **FileReadTool** | `tools/FileReadTool/` | FileReadTool.ts, imageProcessor.ts, limits.ts |
@@ -24,12 +25,14 @@ Claude Code has 20+ built-in tools, each following the tool-per-directory patter
 | **NotebookEditTool** | `tools/NotebookEditTool/` | NotebookEditTool.ts |
 
 ### Shell Execution
+
 | Tool | Directory | Key Files |
 |:-----|:----------|:----------|
 | **BashTool** | `tools/BashTool/` | BashTool.tsx, bashSecurity.ts, bashPermissions.ts, destructiveCommandWarning.ts, sedValidation.ts, shouldUseSandbox.ts |
 | **PowerShellTool** | `tools/PowerShellTool/` | PowerShellTool.tsx, powershellSecurity.ts, gitSafety.ts, clmTypes.ts |
 
 ### Agent & Planning
+
 | Tool | Directory | Key Files |
 |:-----|:----------|:----------|
 | **AgentTool** | `tools/AgentTool/` | AgentTool.tsx, forkSubagent.ts, runAgent.ts, resumeAgent.ts, agentMemory.ts |
@@ -39,6 +42,7 @@ Claude Code has 20+ built-in tools, each following the tool-per-directory patter
 | **ExitWorktreeTool** | `tools/ExitWorktreeTool/` | ExitWorktreeTool.ts |
 
 ### External Integration
+
 | Tool | Directory | Purpose |
 |:-----|:----------|:--------|
 | **MCPTool** | `tools/MCPTool/` | Model Context Protocol integration |
@@ -49,6 +53,7 @@ Claude Code has 20+ built-in tools, each following the tool-per-directory patter
 | **RemoteTriggerTool** | `tools/RemoteTriggerTool/` | Remote agent triggers |
 
 ### Session Management
+
 | Tool | Directory | Purpose |
 |:-----|:----------|:--------|
 | **AskUserQuestionTool** | `tools/AskUserQuestionTool/` | Prompt user for input |
