@@ -1,8 +1,20 @@
 <style>
-  .mermaid {
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    padding: 16px;
-    margin: 16px 0;
+  code.language-mermaid,
+  pre:has(code.language-mermaid) {
+    background-color: #f8f9fa !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    margin: 16px 0 !important;
+    border: none !important;
+  }
+
+  code.language-mermaid svg .edge-thickness-normal path,
+  code.language-mermaid svg .flowchart-link,
+  code.language-mermaid svg line {
+    stroke: #333333 !important;
+  }
+
+  code.language-mermaid svg marker path {
+    fill: #333333 !important;
   }
 </style>
