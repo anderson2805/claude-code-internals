@@ -1,0 +1,32 @@
+// Force Mermaid diagram lines and arrows to white for dark mode visibility
+.mermaid {
+  svg {
+    .flowchart-link,
+    .edge-pattern-solid,
+    .messageLine0,
+    .messageLine1,
+    .relation,
+    line,
+    path.path {
+      stroke: #ffffff !important;
+    }
+
+    marker path {
+      fill: #ffffff !important;
+      stroke: #ffffff !important;
+    }
+
+    .arrowheadPath {
+      fill: #ffffff !important;
+    }
+
+    .edgePath .path {
+      stroke: #ffffff !important;
+    }
+
+    .edgeLabel {
+      background-color: #1e1e2e !important;
+      color: #e0e0e0 !important;
+    }
+  }
+}
