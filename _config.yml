@@ -1,0 +1,36 @@
+title: Claude Code Internals
+description: Technical deep-dive into Claude Code's architecture and internals - an educational resource for power users
+theme: just-the-docs
+
+url: https://anderson2805.github.io
+baseurl: /claude-code-internals
+
+aux_links:
+  "GitHub Repository": https://github.com/anderson2805/claude-code-internals
+
+nav_order: 1
+
+heading_anchors: true
+
+search_enabled: true
+
+back_to_top: true
+back_to_top_text: "Back to top"
+
+footer_content: "An educational resource for Claude Code users. Not affiliated with Anthropic."
+
+color_scheme: dark
+
+callouts:
+  insight:
+    title: Key Insight
+    color: blue
+  tip:
+    title: Power User Tip
+    color: green
+  warning:
+    title: Warning
+    color: red
+  source:
+    title: Source Evidence
+    color: yellow
