@@ -29,6 +29,11 @@ defaults:
 
 mermaid:
   version: "11"
+  config:
+    theme: "dark"
+    themeVariables:
+      lineColor: "#ffffff"
+      arrowheadColor: "#ffffff"
 
 callouts:
   insight:
