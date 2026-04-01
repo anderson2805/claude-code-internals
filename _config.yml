@@ -21,6 +21,12 @@ footer_content: "An educational resource for Claude Code users. Not affiliated w
 
 color_scheme: dark
 
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "default"
+
 callouts:
   insight:
     title: Key Insight
