@@ -27,6 +27,9 @@ The system prompt strategies, context window management, memory systems, and pro
 ### [Practical Tips for Power Users](docs/practical-tips/)
 Actionable advice derived from understanding the internals - how to work *with* the system rather than against it.
 
+### [Agentic Coding Frameworks](docs/agentic-frameworks/)
+Comparative analysis of four leading open-source frameworks that structure AI-assisted development: BMAD Method, Spec Kit, Get Shit Done, and Superpowers. Covers design philosophy, architecture, pros/cons, and when to use which.
+
 ---
 
 ## Key Stats from the Source
