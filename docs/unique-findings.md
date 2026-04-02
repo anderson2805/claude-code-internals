@@ -1,261 +1,252 @@
 ---
-title: Unique Findings
+title: Key Patterns for Developers
 layout: default
 nav_order: 7
 ---
 
-# Unique Findings: Deeper Analysis
+# Key Patterns for Developers
 
-Beyond the widely-covered topics, our combined analysis of the source code and community research uncovered several technical details that deserve dedicated attention. These findings reveal deeper architectural decisions and hidden capabilities.
-
----
-
-## 1. Six Runtime Modes (Not Just CLI)
-
-Most analysis focused on CLI usage. The source reveals Claude Code has **six distinct runtime modes**:
-
-| Mode | Purpose |
-|:-----|:--------|
-| **Local** | Standard CLI interaction |
-| **Remote** | Remote session management via WebSocket |
-| **SSH** | SSH proxy mode |
-| **Teleport** | Resume/create sessions across machines |
-| **Direct-Connect** | IDE extension integration |
-| **Deep-Link** | URL-based session launching |
-
-This is visible in `remote_runtime.py` and `direct_modes.py`. Claude Code is not just a CLI tool -- it's a multi-modal agent platform.
+These are the most impactful patterns from Claude Code's internals that directly affect how effective you are as a developer using it. Each pattern is grounded in source code analysis and explains both *what* happens and *what you should do about it*.
 
 ---
 
-## 2. The Bootstrap Pipeline: 7 Stages with Parallel Prefetch
+## 1. The Prompt Cache Shapes Everything You Do
 
-The startup sequence fires **3 prefetch operations in parallel** before main initialization:
-1. MDM (Mobile Device Management) raw read
-2. Keychain prefetch
-3. Project scan
+Claude Code's prompt cache system isn't just an optimization -- it's a core architectural constraint with **14 tracked cache-break vectors**. Understanding it directly impacts your costs and response speed.
 
-Then proceeds through 7 stages:
-1. Top-level prefetch side effects (parallel I/O warmup)
-2. Warning handler and environment guards
-3. CLI parser and pre-action trust gate
-4. `setup()` + commands/agents parallel load
-5. Deferred init after trust verification (plugins, skills, MCP only load in trusted mode)
-6. Mode routing (6 modes above)
-7. Query engine submit loop
+**How the cache works:**
+- The system prompt (including CLAUDE.md content) is sent with every API call
+- If the prompt prefix is identical to the last call, Anthropic serves it from cache -- **90% cheaper** and faster
+- Anything that changes the prefix invalidates the cache and forces a full re-read
 
-**Key insight:** Trust gating happens at stage 5 -- plugins, skills, MCP prefetch, and session hooks only initialize in trusted mode. This is a defense-in-depth measure against malicious project configurations.
+**What breaks the cache:**
+- Changing permissions mid-conversation (approving new tool categories)
+- Toggling modes frequently (plan mode in/out)
+- Modifying CLAUDE.md during a session
 
----
-
-## 3. Everything Is a Tool (Uniform Dispatch Model)
-
-One of the most elegant architectural decisions: nearly everything is implemented as a tool the model can invoke:
-
-| What | Tool |
-|:-----|:-----|
-| Planning | `EnterPlanModeTool` / `ExitPlanModeV2Tool` |
-| Git worktrees | `EnterWorktreeTool` / `ExitWorktreeTool` |
-| Task management | `TaskCreate` / `TaskGet` / `TaskList` / `TaskOutput` / `TaskStop` / `TaskUpdate` |
-| Team management | `TeamCreateTool` / `TeamDeleteTool` |
-| Cron scheduling | `CronCreateTool` / `CronDeleteTool` / `CronListTool` |
-| Tool discovery | `ToolSearchTool` |
-| Inter-agent comms | `SendMessageTool` |
-| Sleep/waiting | `SleepTool` |
-| Configuration | `ConfigTool` |
-
-This creates a uniform dispatch model where the model uses the same mechanism for everything -- from editing files to managing teams of sub-agents.
+**What this means for you:**
+- **Set permissions up front.** Approve tool categories at the start of a session, not one at a time. Each new permission approval can shift the system prompt.
+- **Keep CLAUDE.md stable during sessions.** Edit it between sessions, not during. It's reinserted every turn (up to 40,000 chars) and stays cached only if unchanged.
+- **Sub-agents are cheap.** They share cache prefixes with the parent, making parallel agent spawning "basically free" in token cost.
+- **Long, focused sessions beat many short ones.** Cache hits accumulate over a session -- restarting means rebuilding the cache from scratch.
 
 ---
 
-## 4. Simple Mode: Restricted Tool Surface
+## 2. CLAUDE.md Is Your Highest-Leverage File
 
-When "simple mode" is enabled, the tool set is restricted to only:
-- `BashTool`
-- `FileReadTool`
-- `FileEditTool`
+CLAUDE.md files occupy a privileged position in the instruction hierarchy:
 
-This is a minimal safe surface for constrained environments. Most analysis didn't mention this mode.
+1. Loaded into **every** system prompt
+2. **Never compressed** during conversation (unlike your earlier messages)
+3. Supports **three scopes**: `~/.claude/CLAUDE.md` (global), project root, and subdirectories
+4. Can hold up to **40,000 characters**
 
----
+**High-impact things to put in CLAUDE.md:**
+- Project coding conventions (naming, patterns, formatting)
+- Test commands and how to run them
+- Architecture decisions ("we use X for Y, not Z")
+- Common pitfalls specific to your codebase
+- Preferred libraries and why
 
-## 5. Plugin Marketplace
+**What NOT to put in CLAUDE.md:**
+- Things that change frequently (sprint goals, current bugs)
+- Anything easily derived from the code itself
+- Verbose documentation -- be concise, every character costs tokens
 
-The source reveals a full plugin marketplace system:
-
-| Module | Purpose |
-|:-------|:--------|
-| `BrowseMarketplace.tsx` | Browse available plugins |
-| `AddMarketplace.tsx` | Add new marketplace sources |
-| `ManageMarketplaces.tsx` | Manage marketplace connections |
-| `DiscoverPlugins.tsx` | Plugin discovery interface |
-| `PluginTrustWarning.tsx` | Trust verification UI |
-| `ValidatePlugin.tsx` | Plugin validation |
-
-This suggests an ecosystem of third-party plugins beyond what's currently publicly documented.
-
----
-
-## 6. The 564-Module Utility Layer
-
-The `utils/` directory contains **564 modules** -- more than triple the next largest subsystem. Notable discoveries:
-
-| Module | What It Reveals |
-|:-------|:----------------|
-| `CircularBuffer.ts` | Fixed-capacity ring buffer for history -- prevents unbounded memory |
-| `QueryGuard.ts` | Rate-limiting and loop detection -- prevents runaway agents |
-| `apiPreconnect.ts` | Pre-establishes API connection during startup |
-| `agentSwarmsEnabled.ts` | Experimental multi-agent swarm mode |
-| `ansiToPng.ts` / `ansiToSvg.ts` | Terminal output to image conversion |
-| `asciicast.ts` | Terminal session recording |
-| `appleTerminalBackup.ts` | macOS Terminal.app workarounds |
-| `agenticSessionSearch.ts` | Cross-session search for agent operations |
-| `attribution.ts` | Code attribution tracking |
-| `analyzeContext.ts` | Context analysis for prompt assembly |
-
----
-
-## 7. Prompt Cache as Cost Architecture
-
-The prompt cache system isn't just an optimization -- it's a core architectural constraint that shapes the entire codebase:
-
-- **14 tracked cache-break vectors** -- anything that could invalidate the cache
-- Functions annotated with `DANGEROUS_uncachedSystemPromptSection()` warnings
-- **"Sticky latches"** prevent mode toggles from breaking the cache
-- Sub-agents share cache prefixes making parallelism "basically free"
-- CLAUDE.md is reinserted every turn (up to 40,000 chars) -- this is cache-friendly because it's constant
-
-This means token economics literally drove architectural decisions. The system is designed around cache-hit maximization.
-
----
-
-## 8. QueryEngine Defaults Reveal Design Intent
-
-The default query engine configuration reveals tuning decisions:
-
-| Parameter | Default | Implication |
-|:----------|:--------|:------------|
-| `max_turns` | 8 | Agent loops are bounded by default |
-| `max_budget_tokens` | 2,000 | Token budget per query is modest |
-| `compact_after_turns` | 12 | Compaction kicks in after 12 turns |
-| `structured_retry_limit` | 2 | JSON parse failures get 2 retries |
-
-The `/compact` command exists as a user-visible slash command, letting users manually trigger compaction when they notice context degradation.
-
----
-
-## 9. WebFetch Pre-Approved URLs
-
-The `tools/WebFetchTool/preapproved.ts` module contains a whitelist of URLs that don't require user permission to fetch. This enables seamless documentation lookups without permission prompts for trusted sources.
-
----
-
-## 10. Hidden Slash Commands
-
-The 207 command entries include many undocumented commands:
-
-| Command | Purpose |
-|:--------|:--------|
-| `/effort` | Control reasoning effort level |
-| `/advisor` | Advisory/suggestion mode |
-| `/insights` | Analytics and insights |
-| `/ctx_viz` | Context window visualization (debugging) |
-| `/bughunter` | Automated bug detection |
-| `/autofix-pr` | Automated PR fix suggestions |
-| `/btw` | Async observation system ("by the way") |
-| `/brief` | Output style control |
-| `/heapdump` | Memory diagnostics |
-| `/release-notes` | Changelog generation |
-| `/good-claw` | Positive feedback mechanism |
-| `/perf-issue` | Performance issue reporting |
-| `/debug-tool-call` | Tool call debugging |
-| `/break-cache` | Force cache invalidation |
-| `/backfill-sessions` | Retroactive session processing |
-| `/ant-trace` | Internal tracing |
-| `/doctor` | Diagnostic self-repair |
-| `/bridge-kick` | Force-reset bridge connections |
-
----
-
-## 11. Constrained Language Mode (CLM) for PowerShell
-
-The `tools/PowerShellTool/clmTypes.ts` module implements support for PowerShell's [Constrained Language Mode](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_language_modes) -- a Windows-specific security feature restricting PowerShell to a safe language subset. This level of platform-specific security hardening is rare in AI coding tools.
-
----
-
-## 12. The Compaction Bug: 250,000 Wasted API Calls/Day
-
-One of the most striking findings: a bug where 1,279 sessions had 50+ consecutive compaction failures. Each failure triggered another API call, wasting an estimated **250,000 API calls per day globally**.
-
-The fix was three lines of code:
+**Directory-scoped CLAUDE.md example:**
 ```
-MAX_CONSECUTIVE_AUTOCOMPACT_FAILURES = 3
+# frontend/CLAUDE.md
+- Use React Query for all data fetching, never raw useEffect
+- Component files use PascalCase, hooks use camelCase with "use" prefix
+- All new components need a Storybook story
 ```
 
-This illustrates how a small oversight in agent loop design can have massive cost implications at scale.
+This scoped file only loads when Claude Code is working in the `frontend/` directory, keeping the prompt lean elsewhere.
 
 ---
 
-## 13. AutoDream: Memory Consolidation During Idle
+## 3. Context Window Is Finite -- Manage It Deliberately
 
-The AutoDream system runs during idle periods with strict gate requirements:
-- 24 hours since last run
-- 5+ completed sessions since last run
+Claude Code auto-compresses older conversation turns as you approach context limits. Understanding the compression mechanics helps you avoid the "Claude forgot what I said" problem.
 
-**Four phases:**
-1. **Orient** -- Scan recent sessions
-2. **Gather** -- Extract signal from recent work
-3. **Consolidate** -- Write to memory
-4. **Prune** -- Keep under 200 lines / 25KB
+**What gets compressed:** Earlier conversation turns and tool results from completed operations.
 
-Runs as a **read-only forked subagent** to prevent corruption of active work. This is essentially "dreaming" -- processing experiences during downtime.
+**What never gets compressed:** System prompt, CLAUDE.md content, current turn context, active tool definitions.
 
----
+**Practical patterns:**
 
-## 14. Plan Mode Is a State Machine (V2)
+| Situation | What To Do |
+|:----------|:-----------|
+| Conversation over ~20 turns | Re-state critical constraints explicitly |
+| Working with large files | Use targeted reads: "read lines 50-100" not "read the file" |
+| Multi-step refactoring | Summarize the plan periodically, don't rely on turn 1 |
+| Exploring a new codebase | Let Claude Code spawn explore sub-agents (keeps main context clean) |
+| Context feels degraded | Use `/compact` to manually trigger compaction with a fresh summary |
 
-The existence of `ExitPlanModeV2Tool` (note the V2 suffix) reveals:
-- Plan mode went through at least two iterations
-- It's implemented as an explicit state transition via tool invocation
-- The model must call a tool to enter/exit -- it's not just a prompt modifier
-- This prevents accidental mode drift during long conversations
+**The sub-agent isolation pattern:** When Claude Code spawns a sub-agent for research, that agent gets its own context window. The results are summarized before returning. This means exploration doesn't eat your main conversation's context budget.
 
 ---
 
-## 15. Git Operation Tracking
+## 4. Everything Is a Tool -- Use the Right One
 
-Beyond individual git safety checks, there's a centralized `tools/shared/gitOperationTracking.ts` module that tracks **all git operations** across all tools. This creates an audit trail and enables:
-- Cross-tool operation coordination
-- Conflict detection
-- Rollback capability
+Claude Code implements nearly everything as a tool the model invokes. Understanding this dispatch model helps you prompt more effectively.
 
----
+**Key tools and when to nudge toward them:**
 
-## 16. SyntheticOutputTool
+| Goal | Tool | Why It Matters |
+|:-----|:-----|:---------------|
+| Architecture planning | `EnterPlanMode` | Disables code edits, focuses on design |
+| Risky changes | `EnterWorktree` | Isolated git worktree, easy to discard |
+| Parallel research | `Agent` (multiple) | Independent context windows, concurrent |
+| Track complex work | `TaskCreate` / `TaskUpdate` | Visible progress tracking |
+| Recurring automation | `CronCreate` | Scheduled autonomous operations |
+| Cross-session handoff | `BriefTool` | Structured context for next session |
 
-The `SyntheticOutputTool` generates structured outputs in specific formats. This is distinct from normal text generation -- it enables Claude Code to produce machine-readable outputs for downstream consumption (JSON schemas, structured reports, etc.).
-
----
-
-## 17. Multi-Agent Spawning
-
-`tools/shared/spawnMultiAgent.ts` reveals a dedicated multi-agent spawning mechanism, separate from the single sub-agent `AgentTool`. This enables coordinated parallel execution of multiple agents with shared context and task distribution.
+**The "plan before code" pattern:** For non-trivial tasks, explicitly ask Claude Code to plan first. Plan mode is a state machine -- the model must call a tool to enter and exit it, preventing accidental drift into implementation before the plan is approved.
 
 ---
 
-## 18. Upstream Proxy Support
+## 5. The Edit-Before-Read Enforcement
 
-The `upstreamproxy/` subsystem enables Claude Code to work through corporate HTTP proxies. This is an enterprise feature enabling deployment in restricted network environments.
+Claude Code's `FileEditTool` will **error** if you ask it to edit a file it hasn't read in the current session. This is enforced in code, not a suggestion.
+
+**Save round trips by combining reads and edits:**
+
+| Instead of | Do this |
+|:-----------|:--------|
+| "Change the return type in utils.ts" | "Read utils.ts and change the return type of functionX to string" |
+| "Fix the bug in handler.ts" | "Read handler.ts lines 40-80, the bug is in the error handling" |
+| "Update the config" | "Read config.ts -- change the timeout from 30 to 60" |
+
+Giving line numbers or function names alongside the edit request helps Claude Code read only what's needed, preserving context budget.
 
 ---
 
-## 19. Migrations System
+## 6. Security Layers Are Working When They Prompt You
 
-The `migrations/` subsystem handles data format migrations between Claude Code versions -- ensuring configuration, memory, and session data survives upgrades. This reveals a commitment to backwards compatibility rare in fast-moving CLI tools.
+Claude Code has **6 layers of security** including 23 Bash command checks. When you get a permission prompt, the system has flagged a real concern.
+
+**Patterns that trigger prompts (and why):**
+
+| Pattern | Why It's Flagged |
+|:--------|:-----------------|
+| `sed -i` in Bash | It's a file write operation via shell, bypassing FileEditTool |
+| `curl \| bash` | Piping remote code to shell execution |
+| Commands touching `.env` files | Potential credential exposure |
+| `rm -rf` or `git reset --hard` | Destructive and hard to reverse |
+| Network requests to non-whitelisted URLs | Data exfiltration risk |
+
+**Trust mode matters:** Plugins, skills, MCP servers, and session hooks **only initialize in trusted mode** (verified at startup stage 5). If you clone an untrusted repo with a malicious CLAUDE.md or plugin config, the trust gate prevents it from executing automatically.
 
 ---
 
-## 20. The "Co-Evolution" Philosophy
+## 7. Parallel Sub-Agents for Speed
 
-Perhaps the most profound architectural insight: Claude Code is designed to **shrink** as models improve. The development philosophy is "delete code on model upgrade" -- scaffolding like explicit planning steps should be removed as model capability increases.
+Claude Code can spawn multiple sub-agents simultaneously, each with their own context window. This is one of the most underused features for complex tasks.
 
-This means the complexity you see today is considered **temporary**. The goal is a progressively thinner orchestration layer that delegates more to the model over time.
+**When to use parallel agents:**
+
+```
+"Research these three things in parallel:
+1. How authentication works in this codebase
+2. Find all API endpoints and their handlers  
+3. Check test coverage for the payment module"
+```
+
+Each agent explores independently and returns a summary. The cost is minimal because sub-agents share cache prefixes with the parent.
+
+**Agent types to know:**
+
+| Type | Best For |
+|:-----|:---------|
+| `Explore` | Codebase research, finding files, understanding patterns |
+| `general-purpose` | Multi-step tasks, running commands, writing code |
+| `Plan` | Architecture design, implementation planning |
+| `code-reviewer` | Reviewing completed work against a plan |
+
+---
+
+## 8. Hooks Turn Claude Code Into an Automated Pipeline
+
+The hook system (104 modules) lets you attach shell commands to Claude Code events:
+
+| Event | Practical Use |
+|:------|:-------------|
+| `PreToolUse` | Validate or block tool calls before execution |
+| `PostToolUse` | Auto-format after writes, auto-lint after edits |
+| `Stop` | Run tests when Claude Code finishes, send notifications |
+
+**Example: Auto-format on every file write**
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "command": "prettier --write $CLAUDE_FILE_PATH"
+      }
+    ]
+  }
+}
+```
+
+This eliminates the "now format it" follow-up and ensures consistent code style without wasting conversation turns.
+
+---
+
+## 9. Memory System Has a Hierarchy -- Use It
+
+Claude Code's memory persists across sessions through a file-based system. The four memory types serve different purposes:
+
+| Type | What to Store | Lifespan |
+|:-----|:-------------|:---------|
+| **user** | Your role, expertise, preferences | Long-term |
+| **feedback** | Corrections and confirmed approaches | Long-term |
+| **project** | Sprint context, deadlines, who's doing what | Medium-term |
+| **reference** | Links to external dashboards, ticket systems, docs | Long-term |
+
+**The AutoDream system** consolidates memories during idle periods (24+ hours between sessions, 5+ completed sessions). It runs as a read-only sub-agent that scans recent sessions, extracts patterns, and prunes memories to stay under 200 lines / 25KB.
+
+**What this means:** You don't need to manually manage all memories. But explicitly telling Claude Code "remember that we use PostgreSQL for all new services" creates a `feedback` memory that persists across every future session.
+
+---
+
+## 10. Useful Commands Most Developers Don't Know
+
+Beyond the well-known slash commands, these are particularly valuable for development workflows:
+
+| Command | What It Does | When to Use |
+|:--------|:-------------|:------------|
+| `/compact` | Manually triggers context compaction | When responses get confused in long sessions |
+| `/effort` | Controls reasoning effort level | Quick tasks don't need deep reasoning |
+| `/doctor` | Runs diagnostic self-checks | When Claude Code behaves unexpectedly |
+| `/brief` | Creates structured session handoffs | When continuing work in a new session |
+| `/bughunter` | Automated bug detection mode | Proactive code review |
+| `/autofix-pr` | Automated PR fix suggestions | After CI failures |
+
+---
+
+## 11. Structure Projects for Optimal AI Assistance
+
+Several architectural details reveal how Claude Code discovers and understands your project:
+
+**Project onboarding:** The first time Claude Code encounters a project, it runs an onboarding scan (`projectOnboardingState.ts`). This analyzes project structure and creates initial context. A clean, conventional project structure makes this faster and more accurate.
+
+**File discovery pattern:** Claude Code uses Glob for file finding and Grep for content search -- never scanning entire directories at once. This means:
+- Standard file naming conventions help (Claude Code knows to look for `*.test.ts`, `*.spec.js`, etc.)
+- Deeply nested or unconventionally named files may be missed on first pass
+- Explicit paths in CLAUDE.md ("tests are in `src/__tests__/`") eliminate guesswork
+
+**Git integration:** A centralized `gitOperationTracking.ts` module tracks all git operations across all tools, enabling conflict detection and rollback. Claude Code treats git state as ground truth -- keep your working tree clean for best results.
+
+---
+
+## 12. The Co-Evolution Principle
+
+Perhaps the most important mental model: Claude Code is designed to **shrink** as models improve. The development philosophy is "delete code on model upgrade."
+
+**What this means for you:**
+- Features that feel like scaffolding (explicit plan steps, detailed tool instructions) are temporary
+- The system adapts to model capabilities -- what works today may become unnecessary tomorrow
+- Stay up to date with Claude Code versions; each update may simplify workflows
+- If a pattern that used to work stops working, it may be because the model no longer needs the guardrail
