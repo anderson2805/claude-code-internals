@@ -1,7 +1,7 @@
 ---
 title: BMAD Method
 layout: default
-parent: Agentic Coding Frameworks
+parent: Agentic Harnesses
 nav_order: 1
 ---
 

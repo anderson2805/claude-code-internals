@@ -1,7 +1,7 @@
 ---
 title: Spec Kit
 layout: default
-parent: Agentic Coding Frameworks
+parent: Agentic Harnesses
 nav_order: 2
 ---
 
