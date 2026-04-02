@@ -46,7 +46,7 @@ Skills are loaded from:
 This module bridges MCP tools with the skill system - allowing MCP servers to provide skills that appear as native Claude Code capabilities.
 
 {: .insight }
-> The `skillify` skill is meta - it's a skill for creating new skills. It converts a natural language workflow description into a structured skill definition. This is how Claude Code enables user-created skills.
+> The `skillify` module is an internal skill builder -- it converts natural language workflow descriptions into structured skill definitions. It is not exposed as a user-facing slash command.
 
 ## Plugin System
 
@@ -98,4 +98,4 @@ The `agentSummary.ts` module creates summaries of sub-agent work, condensing mul
 This service predicts what you might want to do next and suggests it proactively.
 
 {: .tip }
-> You can create your own skills by using the `/skillify` command or by placing skill files in the appropriate plugin directory. Skills are just markdown files with YAML frontmatter - no code required.
+> You can create your own skills by placing skill files in the appropriate plugin directory. Skills are just markdown files with YAML frontmatter - no code required.
