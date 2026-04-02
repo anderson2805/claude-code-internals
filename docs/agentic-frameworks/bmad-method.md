@@ -234,7 +234,7 @@ BMAD-METHOD/
 
 3. **Agent Persona Switching Friction** -- Unlike frameworks where the AI maintains a single coherent context, BMAD's persona model means context switches between agents. The Architect's understanding may not fully transfer to the Developer's execution.
 
-4. **Broad but Uneven Platform Support** -- The installer supports 22 platforms (including Claude Code, Cursor, Codex, Gemini CLI, Copilot, and more), but only Claude Code and Cursor are marked as "preferred." Other platforms may have less-tested integrations.
+4. **Broad but Uneven Platform Support** -- The installer supports 23 platforms (including Claude Code, Cursor, Codex, Gemini CLI, Copilot, and more), but only Claude Code and Cursor are marked as "preferred." Other platforms may have less-tested integrations.
 
 5. **Heavy Node.js Dependency** -- Requiring Node.js 20+ for an NPX installer is a heavier dependency than Spec Kit's Python-based CLI or Superpowers' zero-dependency plugin approach.
 

@@ -53,10 +53,10 @@ graph TD
 | **Creator** | BMad Code Org | GitHub | TACHES / GSD Foundation | Jesse Vincent (Prime Radiant) |
 | **Philosophy** | AI agents as expert collaborators in agile workflows | Specifications are executable; "what" before "how" | Context engineering makes AI reliable; no enterprise theater | Composable skills as mandatory workflows, not suggestions |
 | **Core Metaphor** | Agile team of 8 named AI agent personas | Spec-driven development pipeline | Meta-prompting + context engineering layer | Software dev workflow built on composable skills |
-| **Install** | `npx bmad-method install` | `uv tool install specify-cli` | `npx get-shit-done-cc@latest` | `/plugin install superpowers` |
+| **Install** | `npx bmad-method install` | `uv tool install specify-cli --from git+...spec-kit.git` | `npx get-shit-done-cc@latest` | `/plugin install superpowers@claude-plugins-official` |
 | **Language** | TypeScript / Markdown | Python CLI + Markdown templates | TypeScript / Markdown | Markdown (pure prompt-based) |
-| **Agent Support** | 22 platforms (Claude Code, Cursor preferred) | 25+ agents (most comprehensive) | 8 runtimes (Claude, Gemini, Codex, Copilot, Cursor, Windsurf, Antigravity, OpenCode) | Claude Code, Cursor, Codex, OpenCode, Gemini CLI, Copilot |
-| **Extensibility** | Module ecosystem (5 modules) | Extensions + Presets (38 community extensions) | Commands + agents + templates | Plugin architecture (skills, agents, hooks) |
+| **Agent Support** | 23 platforms (Claude Code, Cursor preferred) | 25+ agents (most comprehensive) | 8 runtimes (Claude, Gemini, Codex, Copilot, Cursor, Windsurf, Antigravity, OpenCode) | Claude Code, Cursor, Codex, OpenCode, Gemini CLI, Copilot |
+| **Extensibility** | Module ecosystem (6 modules incl. community) | Extensions + Presets (38 community extensions) | Commands + agents + templates | Plugin architecture (skills, agents, hooks) |
 | **Key Strength** | Deepest agile process modeling | Broadest agent support + GitHub backing | Context freshness via wave execution | TDD discipline + subagent autonomy |
 | **Complexity** | High (steepest learning curve) | Medium-High (most ceremony) | Medium (complexity hidden behind simple commands) | Low-Medium (auto-triggering skills) |
 
@@ -79,7 +79,7 @@ Each framework takes a fundamentally different approach to turning a vague idea 
 |:----------|:----------------|:-----------------|
 | **BMAD** | Story-based development with sprint ceremonies, dev agent implements per story | Persona context switching; each agent carries its domain knowledge |
 | **Spec Kit** | `/speckit.implement` executes all tasks from the plan | Feature-branch isolation; specs as persistent artifacts |
-| **GSD** | Wave-based parallel execution; fresh 200k context per plan | Each plan gets a clean subagent context; main window stays under 40% |
+| **GSD** | Wave-based parallel execution; fresh 200k context per plan | Each plan gets a clean subagent context; main window stays at 30-40% |
 | **Superpowers** | Subagent-driven development with two-stage review (spec compliance + code quality) | Fresh subagent per task; mandatory TDD cycle |
 
 ### Quality Gates
