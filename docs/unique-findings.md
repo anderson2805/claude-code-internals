@@ -100,7 +100,7 @@ Claude Code implements nearly everything as a tool the model invokes. Understand
 | Parallel research | `Agent` (multiple) | Independent context windows, concurrent |
 | Track complex work | `TaskCreate` / `TaskUpdate` | Visible progress tracking |
 | Recurring automation | `CronCreate` | Scheduled autonomous operations |
-| Cross-session handoff | `BriefTool` | Structured context for next session |
+| Manual compaction | `/compact` | Structured context summary when conversation gets long |
 
 **The "plan before code" pattern:** For non-trivial tasks, explicitly ask Claude Code to plan first. Plan mode is a state machine -- the model must call a tool to enter and exit it, preventing accidental drift into implementation before the plan is approved.
 
@@ -217,12 +217,9 @@ Beyond the well-known slash commands, these are particularly valuable for develo
 
 | Command | What It Does | When to Use |
 |:--------|:-------------|:------------|
-| `/compact` | Manually triggers context compaction | When responses get confused in long sessions |
-| `/effort` | Controls reasoning effort level | Quick tasks don't need deep reasoning |
-| `/doctor` | Runs diagnostic self-checks | When Claude Code behaves unexpectedly |
-| `/brief` | Creates structured session handoffs | When continuing work in a new session |
-| `/bughunter` | Automated bug detection mode | Proactive code review |
-| `/autofix-pr` | Automated PR fix suggestions | After CI failures |
+| `/compact` | Manually triggers context compaction with optional focus instructions | When responses get confused in long sessions |
+| `/effort` | Controls reasoning effort level (low/medium/high/max/auto) | Quick tasks don't need deep reasoning; complex tasks benefit from max |
+| `/doctor` | Runs diagnostic self-checks on installation and settings | When Claude Code behaves unexpectedly |
 
 ---
 
